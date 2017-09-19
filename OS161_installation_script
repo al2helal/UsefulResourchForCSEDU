@@ -1,0 +1,324 @@
+#!/bin/bash
+echo "Thank you for using my script. If you will face any problem during installation read OS161 installation page or mail me at al2helal@gmail.com "
+echo ""
+echo ""
+previous_wdir=`pwd`
+echo "This script install OS161 in your home folder by default."
+read -p "Do you want to change it(y/n)?:" ans
+
+if [ $ans == y -o $ans == Y ]
+then
+	echo "Set your path(absolute) where you want to install OS161."
+
+	while true
+	do
+		read -p "PATH=" newHOME
+		if [ -d $newHOME ]
+		then
+			#update the HOME
+			export HOME=$newHOME
+			break
+		else
+			echo "PATH is invalid.Set path again."
+		fi
+	done	
+fi
+#read -p "exit script" input
+echo "Step 1: Download."
+echo "Step 1 finished."
+echo "Step 2: Build and Install the Binary Utilities (Binutils)"
+tar -xzf os161-binutils.tar.gz
+#check whether the command succeed or not.
+if [ $? -ne 0 ]
+then
+	exit
+fi
+#change directory to new created binutils.
+cd binutils-2.17+os161-2.0.1
+if [ $? -ne 0 ]
+then
+	exit
+fi
+#configure binutils.
+./configure --nfp --disable-werror --target=mips-harvard-os161 --prefix=$HOME/sys161/tools
+#make binutils.
+make
+if [ $? -ne 0 ]
+then
+	exit
+fi
+#install binutils.
+make install
+if [ $? -ne 0 ]
+then
+	exit
+fi
+echo "Step 2 finished."
+
+echo "Step 3: Adjust Your Shell's Command Path"
+#change directory to HOME
+cd $HOME
+mkdir $HOME/sys161/bin
+export PATH=$HOME/sys161/bin:$HOME/sys161/tools/bin:$PATH 
+echo "Step 3 finished."
+
+echo "Step 4: Install the GCC MIPS Cross-Compiler"
+tar -xzf $previous_wdir/os161-gcc.tar.gz
+if [ $? -ne 0 ]
+then
+	exit
+fi
+cd gcc-4.1.2+os161-2.0
+if [ $? -ne 0 ]
+then
+	exit
+fi
+./configure -nfp --disable-shared --disable-threads --disable-libmudflap --disable-libssp --target=mips-harvard-os161 --prefix=$HOME/sys161/tools
+make
+if [ $? -ne 0 ]
+then
+	exit
+fi
+make install
+if [ $? -ne 0 ]
+then
+	exit
+fi
+echo "Step 4 finished."
+
+echo "Step 5: Install GDB"
+cd $HOME
+if [ $? -ne 0 ]
+then
+	exit
+fi
+#extract the os161-gdb from previous directory.
+tar -xzf $previous_wdir/os161-gdb.tar.gz
+if [ $? -ne 0 ]
+then
+	exit
+fi
+#change directory to newly created.
+cd gdb-6.6+os161-2.0
+if [ $? -ne 0 ]
+then
+	exit
+fi
+./configure --target=mips-harvard-os161 --prefix=$HOME/sys161/tools --disable-werror
+if [ $? -ne 0 ]
+then
+	exit
+fi
+#make os161-gdb
+make
+if [ $? -ne 0 ]
+then
+	exit
+fi
+#install gdb
+make install
+if [ $? -ne 0 ]
+then
+	exit
+fi
+echo "Step 5 finished."
+
+echo "Step 6: Install bmake"
+cd $HOME
+if [ $? -ne 0 ]
+then
+	exit
+fi
+tar -xzf $previous_wdir/os161-bmake.tar.gz	
+if [ $? -ne 0 ]
+then
+	exit
+fi
+cd bmake
+if [ $? -ne 0 ]
+then
+	exit
+fi
+tar -xzf $previous_wdir/os161-mk.tar.gz
+if [ $? -ne 0 ]
+then
+	exit
+fi
+./boot-strap --prefix=$HOME/sys161/tools 
+if [ $? -ne 0 ]
+then
+	exit
+fi
+mkdir -p $HOME/sys161/tools/bin
+if [ $? -ne 0 ]
+then
+	exit
+fi
+cp $HOME/bmake/Linux/bmake $HOME/sys161/tools/bin/bmake-20101215
+if [ $? -ne 0 ]
+then
+	exit
+fi
+rm -f $HOME/sys161/tools/bin/bmake
+ln -s bmake-20101215 $HOME/sys161/tools/bin/bmake
+mkdir -p $HOME/sys161/tools/share/man/cat1
+cp $HOME/bmake/bmake.cat1 $HOME/sys161/tools/share/man/cat1/bmake.1
+if [ $? -ne 0 ]
+then
+	exit
+fi
+sh $HOME/bmake/mk/install-mk $HOME/sys161/tools/share/mk
+echo "Step 6 finished."
+
+echo "Step 7: Set Up Links for Toolchain Binaries"
+cd $HOME
+if [ $? -ne 0 ]
+then
+	exit
+fi
+cd $HOME/sys161/tools/bin
+if [ $? -ne 0 ]
+then
+	exit
+fi
+sh -c 'for i in mips-*; do ln -s $HOME/sys161/tools/bin/$i $HOME/sys161/bin/cs350-`echo $i | cut -d- -f4-`; done'
+ln -s $HOME/sys161/tools/bin/bmake $HOME/sys161/bin/bmake
+cd ../../bin
+if [ $? -ne 0 ]
+then
+	exit
+fi
+ls
+echo "Step 7 finished."
+
+echo "Step 8: Build and Install the sys161 Simulator"
+cd $HOME
+if [ $? -ne 0 ]
+then
+	exit
+fi
+tar -xzf $previous_wdir/sys161.tar.gz
+if [ $? -ne 0 ]
+then
+	exit
+fi
+cd sys161-1.99.06
+if [ $? -ne 0 ]
+then
+	exit
+fi
+./configure --prefix=$HOME/sys161 mipseb
+if [ $? -ne 0 ]
+then
+	exit
+fi
+make
+if [ $? -ne 0 ]
+then
+	exit
+fi
+make install
+if [ $? -ne 0 ]
+then
+	exit
+fi
+cd $HOME/sys161
+if [ $? -ne 0 ]
+then
+	exit
+fi
+ln -s share/examples/sys161/sys161.conf.sample sys161.conf 
+echo "Step 8 finished."
+
+echo "Step 9: Install OS/161"
+cd $HOME
+mkdir cs350-os161
+#mv $previous_wdir/os161.tar.gz cs350-os161
+if [ $? -ne 0 ]
+then
+	exit
+fi
+cd cs350-os161
+if [ $? -ne 0 ]
+then
+	exit
+fi
+tar -xzf $previous_wdir/os161.tar.gz
+echo "Step 9 finished."
+
+echo "Step 3: Configure OS/161 and Build the OS/161 Kernel"
+cd os161-1.99
+if [ $? -ne 0 ]
+then
+	exit
+fi
+./configure --ostree=$HOME/cs350-os161/root --toolprefix=cs350-
+if [ $? -ne 0 ]
+then
+	exit
+fi
+cd kern/conf
+if [ $? -ne 0 ]
+then
+	exit
+fi
+./config ASST0
+cd ../compile/ASST0
+if [ $? -ne 0 ]
+then
+	exit
+fi
+bmake depend
+if [ $? -ne 0 ]
+then
+	exit
+fi
+bmake
+if [ $? -ne 0 ]
+then
+	exit
+fi
+bmake install
+if [ $? -ne 0 ]
+then
+	exit
+fi
+echo "Step 3 finished."
+
+echo "Step 4: Build the OS/161 User-level Programs"
+cd $HOME
+if [ $? -ne 0 ]
+then
+	exit
+fi
+cd $HOME/cs350-os161/os161-1.99
+if [ $? -ne 0 ]
+then
+	exit
+fi
+bmake
+if [ $? -ne 0 ]
+then
+	exit
+fi
+bmake install
+if [ $? -ne 0 ]
+then
+	exit
+fi
+echo "Step 4 finished."
+
+echo "Step 5: Try Running OS/161"
+cd $HOME/cs350-os161/root
+if [ $? -ne 0 ]
+then
+	exit
+fi
+cp $HOME/sys161/sys161.conf sys161.conf
+if [ $? -ne 0 ]
+then
+	exit
+fi
+#print this is red color
+echo -e "\e[0;31mThank you for your patience.\e[0m\nKernel is running..."
+sys161 kernel-ASST0

@@ -6,4 +6,6 @@ CSEDU students are allowed to contribute with useful resources, comments, modifi
 
 **JavaFilesConcatenator**
 This script concates all java files in current directory to "MainFileName.java.output" when "MainFileName.java" is the main class.
-shell:$ ./javaFilesConcatenator MainFileName
+```
+$ ./javaFilesConcatenator MainFileName
+```

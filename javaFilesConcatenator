@@ -1,0 +1,8 @@
+#!/bin/bash
+########################################################################################################################
+# This file create a "MainFileName.java.output" file concatenating all java file in this directory.
+# Run this script as '$ ./javaFilesConcatenator MainFileName' when "MainFileName.java" contains the main method.
+########################################################################################################################
+
+cat *.java | sed -e 's/public class/class/g;s/public interface/interface/g' >$1.java.output
+sed -i "s/class $1/public class $1/g" $1.java.output

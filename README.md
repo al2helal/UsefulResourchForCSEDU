@@ -10,7 +10,12 @@ This script concates all java files in current directory to ```MainFileName.java
 
 
 Run this as follows-
-
+when ```javaFilesConcatenator``` is located in current directory.
 ```
 $ ./javaFilesConcatenator MainFileName
 ```
+or,
+when ```javaFilesConcatenator``` is located in ```/usr/bin/```  or ```/bin```
+```
+$ javaFilesConcatenator MainFileName
+``` 

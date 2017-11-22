@@ -1,7 +1,7 @@
-Download this Directory(MCSResourceDownloader)
-<a href="https://www.dropbox.com/s/f08yqgdesnknj1s/Sedgewick_LinearProgramming.pdf" download="downlaod"</a>
+Download this Directory [MCSResourceDownloader](.)
 
 Then go to the directory.
-
+```bash
 cd MCSResourceDownloader
 ./resourceDownloader
+```

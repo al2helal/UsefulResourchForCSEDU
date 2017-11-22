@@ -1,0 +1,10 @@
+########################################################################################################################
+# This script is created for downloading all resource from piazza class resource site.
+# Resource url https://piazza.com/university_of_dhaka/summer2017/cse3205/resources
+# Course Teacher : Dr. Amin Ahsan Ali
+# Script author : alhelal
+########################################################################################################################
+#!/bin/bash
+wget -i homeWorkLink -P HomeWork
+wget -i lectureNoteLink -P LectureNote
+wget -i generalResourceLink -P GeneralResource
